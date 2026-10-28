@@ -1,16 +1,3 @@
-async function tryLogin(username, password) {
-    // 1. Anfrage an den Server schicken und auf die Antwort warten (await)
-    const response = await fetch("http://localhost:3000/login", {
-        method: "POST",                                  
-        headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ username, password }),    // Objekt -> JSON-Text
-  });
-    return response.status === 200
-
-
-}
-tryLogin("admin", "cat").then((ok) => console.log("Treffer?", ok));
-
 const charset = "abcdefghijklmnopqrstuvwxyz"; //Nummer und Sonderzeichen sind rausgenommen worden weil sonst geht das durchgehen zu lange.
 const maxLength = 4;
 const username = "admin";

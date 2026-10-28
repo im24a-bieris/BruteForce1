@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json()); // liest JSON aus dem Request-Body in req.body
 
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
+  const { username, password } = req.body || {};
 
   // User mit passendem Namen UND Passwort suchen (Klartext-Vergleich -> angreifbar)
   const user = users.find(

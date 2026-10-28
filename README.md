@@ -52,7 +52,7 @@ Immer **aus dem Projekt-Stammverzeichnis** starten (der Wörterbuch-Angriff lies
 
 - **Wörterbuch** findet das Passwort `monkey`, weil es in `data/dictionary.txt` steht.
 - **Brute-Force** findet es mit den Standardwerten *nicht*: Der Zeichensatz ist
-  `a–z` plus `0–9` und `maxLength = 4`, das Passwort `monkey` hat aber 6 Zeichen.
+  `a–z` und `maxLength = 4`, das Passwort `monkey` hat aber 6 Zeichen.
   Das verdeutlicht, dass ein passendes Wörterbuch dem reinen Durchprobieren oft
   überlegen ist.
 

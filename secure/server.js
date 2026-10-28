@@ -21,7 +21,7 @@ function passwordIsCorrect(password, user) {
 }
 
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password } = req.body || {};
 
   // 1) Jeder Versuch wird bewusst verzögert -> bremst das schnelle Durchprobieren
   await sleep(DELAY_MS);
