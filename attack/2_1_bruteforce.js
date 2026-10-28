@@ -11,7 +11,7 @@ async function tryLogin(username, password) {
 }
 tryLogin("admin", "cat").then((ok) => console.log("Treffer?", ok));
 
-const charset = "abcdefghijklmnopqrstuvwxyz";
+const charset = "abcdefghijklmnopqrstuvwxyz"; //Nummer und Sonderzeichen sind rausgenommen worden weil sonst geht das durchgehen zu lange.
 const maxLength = 4;
 const username = "admin";
 
