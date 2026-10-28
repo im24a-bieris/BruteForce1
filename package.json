@@ -8,7 +8,13 @@
     "server:secure": "node secure/server.js",
     "bruteforce": "node attack/2_1_bruteforce.js",
     "dictionary": "node attack/2_2_dictionary.js",
-    "poly": "node attack/2_3_polyalphabet.js"
+    "poly": "node attack/2_2_polyalphabet.js",
+    "rainbow:build": "node scripts/build_rainbow.js",
+    "rainbow": "node attack/2_3_rainbow.js",
+    "parallel": "node attack/2_3_parallel.js",
+    "defense:progressive": "node defenses/progressive_delay.js",
+    "defense:captcha": "node defenses/captcha.js",
+    "defense:logging": "node defenses/logging_defense.js"
   },
   "repository": {
     "type": "git",
