@@ -2,7 +2,7 @@
 // Funktioniert hier nur, weil der verwundbare Server beliebig viele Versuche zulässt.
 
 const charset = "abcdefghijklmnopqrstuvwxyz"; // nur a-z, mit Zahlen/Sonderzeichen würde es zu lange dauern
-const maxLength = 4; // bis zu 4 Zeichen lange Passwörter testen
+const maxLength = 10; // bis zu 10 Zeichen lange Passwörter testen
 const username = "admin"; // den Benutzernamen kennen wir, nur das Passwort nicht
 
 // einen Login-Versuch schicken, gibt true zurück wenn das Passwort stimmt
