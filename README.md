@@ -1,130 +1,76 @@
 # BruteForce1
 
-Projekt für **M183 / LU02f – LB2**, Fokusthema **Brute-Force**. Es zeigt an einem
-bewusst verwundbaren Login-System verschiedene **Angriffe** (2.1–2.3) und
-**Gegenmassnahmen** (3.1–3.3). Angriffe/Verteidigungen laufen über die Kommandozeile;
-zusätzlich gibt es eine ganz simple Login-Webseite (`public/index.html`).
+Unser Projekt für M183 / LU02f (LB2), Thema Brute-Force. An einem absichtlich
+unsicheren Login zeigen wir ein paar Angriffe und die passenden Gegenmassnahmen.
+Das meiste läuft über die Kommandozeile, dazu gibt es eine kleine Login-Seite.
 
-> ⚠️ Nur lokal auf `localhost` zu Lernzwecken. Niemals gegen fremde Systeme einsetzen.
+Nur lokal auf localhost zum Lernen gedacht, nicht gegen fremde Systeme.
 
-## Voraussetzungen
+## Setup
 
-- Node.js 18+ (nutzt `fetch`, `worker_threads`, `crypto`)
-- Abhängigkeiten installieren: `npm install`
+Node.js 18 oder neuer, dann einmal:
 
-Immer **aus dem Projekt-Stammverzeichnis** starten (einige Skripte lesen Dateien
-aus `data/` relativ zum aktuellen Verzeichnis).
-
-## Abdeckung der Bewertung
-
-| Rubrik | Variante | Datei | Start |
-| --- | --- | --- | --- |
-| 2.1 Angriff | Mono-Alphabet | `attack/2_1_bruteforce.js` | `npm run bruteforce` |
-| 2.2 Angriff | Dictionary (+ Permutationen) | `attack/2_2_dictionary.js` | `npm run dictionary` |
-| 2.2 Angriff | Poly-Alphabet | `attack/2_2_polyalphabet.js` | `npm run poly` |
-| 2.3 Angriff | Rainbow-Table | `attack/2_3_rainbow.js` (+ `scripts/build_rainbow.js`) | `npm run rainbow:build` dann `npm run rainbow` |
-| 2.3 Angriff | Parallelisiert | `attack/2_3_parallel.js` | `npm run parallel` |
-| 3.1 Verteidigung | Linear Delay | `defenses/linear_delay.js` (auch in `secure/server.js`) | `npm run defense:linear` |
-| 3.1 Verteidigung | Progressive Delay | `defenses/progressive_delay.js` | `npm run defense:progressive` |
-| 3.2 Verteidigung | Counter-Limit | `defenses/counter_limit.js` (auch in `secure/server.js`) | `npm run defense:counter` |
-| 3.2 Verteidigung | Captcha | `defenses/captcha.js` | `npm run defense:captcha` |
-| 3.3 Verteidigung | Logging + Alarm | `defenses/logging_defense.js` (auch im `secure/server.js`) | `npm run defense:logging` |
-
-Jeder Angriff und jede Verteidigung liegt in einer eigenen Datei (Rubrik 4.1.4 / 4.2.4).
-
-## Projektstruktur
-
+```bash
+npm install
 ```
-vulnerable/server.js   Verwundbarer Login-Server (Klartext-Vergleich), Port 3000
-secure/server.js       Abgesicherter Server (Hashing, Delay, Lockout, Logging), Port 3001
-attack/                Ein Skript pro Angriffsvariante
-defenses/              Ein Skript pro Verteidigungsvariante (umschliesst common/login.js)
-common/                Gemeinsame Hilfen: login.js (simulierter Login), target.js (Offline-Ziel-Hash)
-scripts/build_rainbow.js  Baut die Lookup-Tabelle data/rainbow_table.csv
-demo/run_demo.js       Startet einen Angriff nach Wahl: node demo/run_demo.js <angriff>
-data/                  users.json, users.secure.json, dictionary.txt, victim_profile.json
-logs/                  login_attempts.csv (von der Logging-Verteidigung erzeugt)
-```
+
+Die Skripte immer aus dem Projektordner starten, weil einige Dateien aus `data/`
+relativ geladen werden.
 
 ## Angriffe
 
-### 2.1 Mono-Alphabet (`npm run bruteforce`)
-Online gegen den Server (Port 3000). Probiert alle Kombinationen aus **einem**
-Zeichensatz (nur `a–z`) bis `maxLength = 4`. Findet `monkey` bewusst **nicht**
-(6 Zeichen) – zeigt, dass reines Durchprobieren schnell an Grenzen stösst.
+Die Online-Angriffe brauchen den laufenden Server (`npm run server`), die
+Offline-Angriffe nicht.
 
-### 2.2 Dictionary + Permutationen (`npm run dictionary`)
-Online. Testet erst **Permutationen aus persönlichen Daten** des Opfers
-(`data/victim_profile.json`: Name, Geburtsjahr, Haustier → z.B. `monkey`,
-`monkey1998`, `monkey98`), danach die Wortliste `data/dictionary.txt`. Findet
-`monkey` sofort über das Haustier – genau die Schwäche, die dieser Angriff ausnutzt.
-
-### 2.2 Poly-Alphabet (`npm run poly`)
-Online. Wie Mono-Alphabet, aber mit **kombiniertem** Zeichensatz
-(`a–z`, `A–Z`, `0–9`, Sonderzeichen). Zielt auf den Benutzer `test` mit dem
-kurzen Passwort `a7`. `maxLength` ist klein gehalten, weil der Suchraum pro
-Stelle viel grösser ist.
-
-### 2.3 Rainbow-Table (`npm run rainbow:build` → `npm run rainbow`)
-**Offline.** `scripts/build_rainbow.js` berechnet einmalig alle Hashes für kurze
-`a–z`-Passwörter und speichert sie als `hash,klartext` in `data/rainbow_table.csv`.
-Der Angriff selbst rechnet nichts mehr, sondern **schlägt den gestohlenen Hash nur
-nach** (Ziel-Hash in `common/target.js`, Passwort `cat`).
-
-### 2.3 Parallelisiert (`npm run parallel`)
-**Offline.** Teilt den Zeichensatz auf mehrere `worker_threads` auf – jeder Worker
-durchsucht nur Passwörter, die mit seinen zugeteilten Anfangsbuchstaben beginnen.
-Der erste Treffer stoppt die übrigen Worker.
+- `npm run bruteforce` – Mono-Alphabet (2.1): probiert alle Kombinationen aus
+  nur `a-z` durch, bis 4 Zeichen. Findet `monkey` absichtlich nicht (zu lang),
+  das zeigt die Grenze vom reinen Durchprobieren.
+- `npm run dictionary` – Wörterbuch (2.2): testet zuerst Varianten aus den
+  persönlichen Daten in `data/victim_profile.json` (Name, Geburtsjahr, Haustier),
+  danach die Liste in `data/dictionary.txt`. Findet `monkey` über das Haustier.
+- `npm run poly` – Poly-Alphabet (2.2): wie oben, aber mit allen Zeichen
+  (`a-z`, `A-Z`, `0-9`, Sonderzeichen). Knackt den Benutzer `test` mit Passwort `a7`.
+- `npm run rainbow:build` und dann `npm run rainbow` – Rainbow-Table (2.3,
+  offline): erst werden die Hashes in `data/rainbow_table.csv` berechnet, der
+  Angriff schlägt den gestohlenen Hash dann nur noch nach.
+- `npm run parallel` – Parallelisiert (2.3, offline): verteilt die Suche auf
+  mehrere Worker-Threads, jeder übernimmt einen Teil der Anfangsbuchstaben.
 
 ## Gegenmassnahmen
 
-### 3.1 Linear Delay — `npm run defense:linear`
-Jeder Login-Versuch wartet fest 500 ms → bremst automatisiertes Durchprobieren.
-Dieselbe Massnahme steckt auch im `secure/server.js`.
+Jede Massnahme hat ihre eigene Datei in `defenses/` mit einer kleinen Demo.
 
-### 3.1 Progressive Delay — `npm run defense:progressive`
-Wartezeit wächst pro Fehlversuch: **10 s, dann 1 min, …** (Vorgabe). Für eine
-schnelle Demo: `node defenses/progressive_delay.js --fast` (1 s, 2 s, …).
+- `npm run defense:linear` – Linear Delay (3.1): wartet vor jedem Versuch 500 ms.
+- `npm run defense:progressive` – Progressive Delay (3.1): Wartezeit wird nach
+  jedem Fehlversuch länger (10 s, dann 1 min, ...). Mit `--fast` kürzer für die Demo.
+- `npm run defense:counter` – Counter-Limit (3.2): nach ein paar Fehlversuchen
+  wird der Benutzer gesperrt, danach geht auch das richtige Passwort nicht mehr.
+- `npm run defense:captcha` – Captcha (3.2): ab dem 3. Fehlversuch kommt eine
+  Rechenaufgabe, an der ein automatisches Skript hängen bleibt.
+- `npm run defense:logging` – Logging + Alarm (3.3): schreibt Fehlversuche nach
+  `logs/login_attempts.csv` und meldet Alarm bei 3 Versuchen in 60 Sekunden.
 
-### 3.2 Counter-Limit — `npm run defense:counter`
-Nach mehreren Fehlversuchen wird der Benutzer gesperrt; danach wird sogar das
-richtige Passwort abgelehnt. Im `secure/server.js` ist dieselbe Idee als Sperre
-für 15 Minuten umgesetzt (Antwort `429`).
+Der sichere Server (`npm run server:secure`, Port 3001) fasst mehrere davon
+zusammen: scrypt-Hash mit Salt statt Klartext, feste Verzögerung, Sperre nach
+5 Versuchen, Logging/Alarm und eine Fehlermeldung, die nicht verrät, ob der
+Benutzer existiert.
 
-### 3.2 Captcha — `npm run defense:captcha`
-Nach 3 Fehlversuchen muss vor jedem weiteren Login eine Rechenaufgabe gelöst
-werden. Ein automatisches Skript bleibt daran hängen. (Interaktiv: Eingabe nötig.)
+## Login-Seite
 
-### 3.3 Logging + Alarm — `npm run defense:logging`
-Jeder Fehlversuch wird mit Zeitstempel und Benutzername in
-`logs/login_attempts.csv` protokolliert. Bei ≥ 3 Fehlversuchen desselben
-Benutzers in 60 s wird ein **ALARM** ausgegeben. Dieselbe Logik steckt auch im
-`secure/server.js`.
+`npm run server` starten und `http://localhost:3000` im Browser öffnen. Mit
+`admin` / `monkey` kommt "Eingeloggt!", sonst der Fehlertext. Die Seite schickt
+genau dieselbe Anfrage wie die Angriffsskripte.
 
-## Sicherer Server im Überblick (`npm run server:secure`, Port 3001)
+## Ordner
 
-Bündelt mehrere Massnahmen in einem echten Server: **scrypt-Hashing + Salt**
-(`data/users.secure.json`, kein Klartext), **feste Verzögerung**,
-**Lockout nach 5 Versuchen**, **Logging + Alarm** und eine **unspezifische
-Fehlermeldung** (verrät nicht, ob der Benutzer existiert). Lässt man einen
-Online-Angriff gegen Port 3001 laufen (URL im Angriffsskript anpassen), bricht er
-am Lockout ab.
-
-## Frontend (ganz simpel)
-
-Der verwundbare Server liefert unter `/` eine einfache Login-Seite aus
-(`public/index.html`). Server starten und im Browser öffnen:
-
-```bash
-npm run server        # Port 3000
-# dann http://localhost:3000 im Browser öffnen
 ```
-
-Eingabe `admin` / `monkey` → „✅ Eingeloggt!", sonst „❌ …". Die Seite schickt
-dieselbe `POST /login`-Anfrage wie die Angriffsskripte.
-
-## Demo-Starter
-
-```bash
-node demo/run_demo.js rainbow     # bruteforce | dictionary | poly | rainbow | parallel
+vulnerable/   unsicherer Server (Klartext-Vergleich), Port 3000
+secure/       abgesicherter Server, Port 3001
+attack/       ein Skript pro Angriff
+defenses/     ein Skript pro Gegenmassnahme
+common/       login.js (simulierter Login), target.js (Ziel-Hash für offline)
+scripts/      build_rainbow.js baut die Lookup-Tabelle
+demo/         run_demo.js startet einen Angriff: node demo/run_demo.js <angriff>
+data/         Benutzer, Wortliste, Opferprofil
+public/       die Login-Seite
 ```
