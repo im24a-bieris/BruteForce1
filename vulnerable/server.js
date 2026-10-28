@@ -1,24 +1,31 @@
-const express = require("express");
-const users = require("../data/users.json"); // [{ username, password }]
+// Unsicherer Login-Server: vergleicht das Passwort im Klartext und erlaubt
+// beliebig viele Versuche. Genau das macht ihn angreifbar.
+
+const express = require("express"); // Framework, das den Webserver einfach macht
+const users = require("../data/users.json"); // unsere "Datenbank": [{ username, password }]
 
 const app = express();
-app.use(express.json()); // liest JSON aus dem Request-Body in req.body
+app.use(express.json()); // wandelt den JSON-Text der Anfrage in req.body um
 
+// wird aufgerufen, wenn eine POST-Anfrage an /login kommt
+// req = Anfrage mit den gesendeten Daten, res = unsere Antwort
 app.post("/login", (req, res) => {
-  const { username, password } = req.body || {};
+  const { username, password } = req.body || {}; // || {} falls gar kein Body gesendet wird
 
-  // User mit passendem Namen UND Passwort suchen (Klartext-Vergleich -> angreifbar)
+  // Benutzer suchen, bei dem Name UND Passwort stimmen
+  // der direkte Klartext-Vergleich (===) ist die Schwachstelle
   const user = users.find(
     (u) => u.username === username && u.password === password
   );
 
   if (user) {
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true }); // 200 = Login OK
   } else {
-    return res.status(401).json({ success: false, message: "Login fehlgeschlagen" });
+    return res.status(401).json({ success: false, message: "Login fehlgeschlagen" }); // 401 = abgelehnt
   }
 });
 
+// Server starten und auf Port 3000 auf Anfragen warten
 app.listen(3000, () => {
   console.log("Vulnerabler Server läuft auf http://localhost:3000");
 });
