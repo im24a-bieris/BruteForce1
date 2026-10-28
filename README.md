@@ -2,7 +2,8 @@
 
 Projekt für **M183 / LU02f – LB2**, Fokusthema **Brute-Force**. Es zeigt an einem
 bewusst verwundbaren Login-System verschiedene **Angriffe** (2.1–2.3) und
-**Gegenmassnahmen** (3.1–3.3). Kein Frontend – alles läuft über die Kommandozeile.
+**Gegenmassnahmen** (3.1–3.3). Angriffe/Verteidigungen laufen über die Kommandozeile;
+zusätzlich gibt es eine ganz simple Login-Webseite (`public/index.html`).
 
 > ⚠️ Nur lokal auf `localhost` zu Lernzwecken. Niemals gegen fremde Systeme einsetzen.
 
@@ -23,9 +24,9 @@ aus `data/` relativ zum aktuellen Verzeichnis).
 | 2.2 Angriff | Poly-Alphabet | `attack/2_2_polyalphabet.js` | `npm run poly` |
 | 2.3 Angriff | Rainbow-Table | `attack/2_3_rainbow.js` (+ `scripts/build_rainbow.js`) | `npm run rainbow:build` dann `npm run rainbow` |
 | 2.3 Angriff | Parallelisiert | `attack/2_3_parallel.js` | `npm run parallel` |
-| 3.1 Verteidigung | Linear Delay | `secure/server.js` (500 ms pro Versuch) | `npm run server:secure` |
+| 3.1 Verteidigung | Linear Delay | `defenses/linear_delay.js` (auch in `secure/server.js`) | `npm run defense:linear` |
 | 3.1 Verteidigung | Progressive Delay | `defenses/progressive_delay.js` | `npm run defense:progressive` |
-| 3.2 Verteidigung | Counter-Limit | `secure/server.js` (Sperre nach 5 Versuchen) | `npm run server:secure` |
+| 3.2 Verteidigung | Counter-Limit | `defenses/counter_limit.js` (auch in `secure/server.js`) | `npm run defense:counter` |
 | 3.2 Verteidigung | Captcha | `defenses/captcha.js` | `npm run defense:captcha` |
 | 3.3 Verteidigung | Logging + Alarm | `defenses/logging_defense.js` (auch im `secure/server.js`) | `npm run defense:logging` |
 
@@ -77,15 +78,18 @@ Der erste Treffer stoppt die übrigen Worker.
 
 ## Gegenmassnahmen
 
-### 3.1 Linear Delay — `secure/server.js`
+### 3.1 Linear Delay — `npm run defense:linear`
 Jeder Login-Versuch wartet fest 500 ms → bremst automatisiertes Durchprobieren.
+Dieselbe Massnahme steckt auch im `secure/server.js`.
 
 ### 3.1 Progressive Delay — `npm run defense:progressive`
 Wartezeit wächst pro Fehlversuch: **10 s, dann 1 min, …** (Vorgabe). Für eine
 schnelle Demo: `node defenses/progressive_delay.js --fast` (1 s, 2 s, …).
 
-### 3.2 Counter-Limit — `secure/server.js`
-Nach 5 Fehlversuchen pro Benutzer 15 Minuten gesperrt (Antwort `429`).
+### 3.2 Counter-Limit — `npm run defense:counter`
+Nach mehreren Fehlversuchen wird der Benutzer gesperrt; danach wird sogar das
+richtige Passwort abgelehnt. Im `secure/server.js` ist dieselbe Idee als Sperre
+für 15 Minuten umgesetzt (Antwort `429`).
 
 ### 3.2 Captcha — `npm run defense:captcha`
 Nach 3 Fehlversuchen muss vor jedem weiteren Login eine Rechenaufgabe gelöst
@@ -105,6 +109,19 @@ Bündelt mehrere Massnahmen in einem echten Server: **scrypt-Hashing + Salt**
 Fehlermeldung** (verrät nicht, ob der Benutzer existiert). Lässt man einen
 Online-Angriff gegen Port 3001 laufen (URL im Angriffsskript anpassen), bricht er
 am Lockout ab.
+
+## Frontend (ganz simpel)
+
+Der verwundbare Server liefert unter `/` eine einfache Login-Seite aus
+(`public/index.html`). Server starten und im Browser öffnen:
+
+```bash
+npm run server        # Port 3000
+# dann http://localhost:3000 im Browser öffnen
+```
+
+Eingabe `admin` / `monkey` → „✅ Eingeloggt!", sonst „❌ …". Die Seite schickt
+dieselbe `POST /login`-Anfrage wie die Angriffsskripte.
 
 ## Demo-Starter
 

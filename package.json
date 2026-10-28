@@ -12,7 +12,9 @@
     "rainbow:build": "node scripts/build_rainbow.js",
     "rainbow": "node attack/2_3_rainbow.js",
     "parallel": "node attack/2_3_parallel.js",
+    "defense:linear": "node defenses/linear_delay.js",
     "defense:progressive": "node defenses/progressive_delay.js",
+    "defense:counter": "node defenses/counter_limit.js",
     "defense:captcha": "node defenses/captcha.js",
     "defense:logging": "node defenses/logging_defense.js"
   },

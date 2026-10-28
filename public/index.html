@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Login-Demo</title>
+</head>
+<body style="font-family: sans-serif; max-width: 300px; margin: 40px auto;">
+  <h1>Login</h1>
+
+  <!-- ganz simples Formular: Benutzername, Passwort, Button -->
+  <input id="username" placeholder="Benutzername" value="admin" /><br /><br />
+  <input id="password" type="password" placeholder="Passwort" /><br /><br />
+  <button onclick="doLogin()">Einloggen</button>
+
+  <!-- hier wird das Ergebnis angezeigt -->
+  <p id="result"></p>
+
+  <script>
+    async function doLogin() {
+      // Werte aus den Eingabefeldern holen
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      // an denselben Server schicken, der diese Seite ausliefert (POST /login)
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      // 200 = Login OK, sonst falsch -> Ergebnis anzeigen
+      const result = document.getElementById("result");
+      if (response.status === 200) {
+        result.textContent = "✅ Eingeloggt!";
+      } else {
+        result.textContent = "❌ Falscher Benutzername oder Passwort";
+      }
+    }
+  </script>
+</body>
+</html>

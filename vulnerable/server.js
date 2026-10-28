@@ -4,8 +4,11 @@
 const express = require("express"); // Framework, das den Webserver einfach macht
 const users = require("../data/users.json"); // unsere "Datenbank": [{ username, password }]
 
+const path = require("path");
+
 const app = express();
 app.use(express.json()); // wandelt den JSON-Text der Anfrage in req.body um
+app.use(express.static(path.join(__dirname, "..", "public"))); // liefert das Frontend (public/index.html) aus
 
 // wird aufgerufen, wenn eine POST-Anfrage an /login kommt
 // req = Anfrage mit den gesendeten Daten, res = unsere Antwort
@@ -26,6 +29,7 @@ app.post("/login", (req, res) => {
 });
 
 // Server starten und auf Port 3000 auf Anfragen warten
-app.listen(3000, () => {
-  console.log("Vulnerabler Server läuft auf http://localhost:3000");
+const PORT = process.env.PORT || 3000; // Port notfalls per Umgebungsvariable überschreibbar
+app.listen(PORT, () => {
+  console.log(`Vulnerabler Server läuft auf http://localhost:${PORT}`);
 });
