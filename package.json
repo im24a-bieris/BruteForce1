@@ -1,10 +1,13 @@
 {
   "name": "bruteforce1",
   "version": "1.0.0",
-  "description": "",
+  "description": "Lerndemo zu Brute-Force- und Wörterbuch-Angriffen gegen einen bewusst verwundbaren Login-Server (Modul 347).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node vulnerable/server.js",
+    "server:secure": "node secure/server.js",
+    "bruteforce": "node attack/2_1_bruteforce.js",
+    "dictionary": "node attack/2_2_dictionary.js"
   },
   "repository": {
     "type": "git",
