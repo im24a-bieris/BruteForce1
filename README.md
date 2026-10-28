@@ -24,7 +24,8 @@ npm install
 | `secure/server.js`          | Abgesicherter Login-Server (Hashing, Lockout, Verzögerung).       |
 | `attack/2_1_bruteforce.js`  | Brute-Force: probiert Zeichenkombinationen durch.                 |
 | `attack/2_2_dictionary.js`  | Wörterbuch-Angriff: testet die Wörter aus `data/dictionary.txt`.  |
-| `data/users.json`           | Zugangsdaten des verwundbaren Servers (`admin` / `monkey`).       |
+| `attack/2_3_polyalphabet.js`| Poly-Alphabet-Brute-Force mit vollem Zeichensatz (a–z, A–Z, 0–9, Sonderzeichen). |
+| `data/users.json`           | Zugangsdaten des verwundbaren Servers (`admin`/`monkey`, `test`/`a7`). |
 | `data/users.secure.json`    | Zugangsdaten des sicheren Servers (scrypt-Hash + Salt).           |
 | `data/dictionary.txt`       | Liste häufiger Passwörter.                                         |
 
@@ -44,8 +45,9 @@ Immer **aus dem Projekt-Stammverzeichnis** starten (der Wörterbuch-Angriff lies
 2. In einem zweiten Terminal einen Angriff starten:
 
    ```bash
-   npm run bruteforce    # Zeichen-für-Zeichen
+   npm run bruteforce    # Zeichen-für-Zeichen (nur a–z)
    npm run dictionary    # Wörterbuch
+   npm run poly          # Poly-Alphabet: voller Zeichensatz, Ziel-Benutzer `test`
    ```
 
 ## Erwartetes Ergebnis
@@ -55,6 +57,10 @@ Immer **aus dem Projekt-Stammverzeichnis** starten (der Wörterbuch-Angriff lies
   `a–z` und `maxLength = 4`, das Passwort `monkey` hat aber 6 Zeichen.
   Das verdeutlicht, dass ein passendes Wörterbuch dem reinen Durchprobieren oft
   überlegen ist.
+- **Poly-Alphabet** nutzt den vollen Zeichensatz (a–z, A–Z, 0–9, Sonderzeichen) und
+  findet das kurze Passwort `a7` des Benutzers `test`. Weil der Suchraum pro Stelle
+  viel grösser ist, ist `maxLength` hier klein gehalten – das zeigt, wie stark mehr
+  Zeichen den Aufwand in die Höhe treiben.
 
 ## Sicherer Server (Gegenmassnahmen)
 
@@ -75,6 +81,9 @@ Umgesetzte Massnahmen:
 - **Feste Verzögerung** – jeder Versuch dauert mindestens 500 ms, was
   automatisiertes Durchprobieren stark ausbremst.
 - **Unspezifische Fehlermeldung** – verrät nicht, ob der Benutzername existiert.
+- **Logging + Alarm** – jeder Fehlversuch wird mit Zeitstempel und Benutzername in
+  `logs/login_attempts.csv` protokolliert. Häufen sich 3 Fehlversuche desselben
+  Benutzers innerhalb von 60 Sekunden, gibt der Server eine `[ALARM]`-Warnung aus.
 
 Lässt man `npm run dictionary` gegen den sicheren Server laufen (URL im Skript auf
 Port `3001` anpassen), bricht der Angriff nach wenigen Versuchen am Lockout ab.
