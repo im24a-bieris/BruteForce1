@@ -4,17 +4,23 @@
 // Passwörter, die damit beginnen. Wer zuerst fündig wird, meldet es; danach
 // werden die anderen Worker beendet.
 
+// worker_threads lässt mehrere Teile dieses Programms GLEICHZEITIG laufen.
+// Ein "Worker" ist wie ein zweites Node-Programm, das parallel arbeitet.
+// Trick: Dieselbe Datei wird sowohl als Haupt-Programm als auch als Worker
+// gestartet. Die Variable isMainThread sagt uns, in welcher Rolle wir gerade sind.
 const { Worker, isMainThread, parentPort, workerData } = require("worker_threads");
 const { sha256, TARGET_HASH } = require("../common/target");
 
 const charset = "abcdefghijklmnopqrstuvwxyz";
 const maxLength = 3;
-const WORKERS = 4;
+const WORKERS = 4; // so viele parallele Worker starten wir
 
 // ---------------------------------------------------------------------------
 // WORKER-Teil: durchsucht nur Passwörter, die mit einem der "firstChars" beginnen
 // ---------------------------------------------------------------------------
 if (!isMainThread) {
+  // baut ab einem Anfangsstück alle Passwörter dieser Länge und vergleicht den
+  // Hash mit dem Ziel-Hash; gibt den Treffer zurück oder null
   function search(prefix, length) {
     if (prefix.length === length) {
       return sha256(prefix) === TARGET_HASH ? prefix : null;
@@ -26,6 +32,7 @@ if (!isMainThread) {
     return null;
   }
 
+  // workerData.firstChars = die Anfangsbuchstaben, die genau DIESER Worker prüfen soll
   let result = null;
   for (const first of workerData.firstChars) {
     for (let length = 1; length <= maxLength; length++) {
@@ -34,7 +41,7 @@ if (!isMainThread) {
     }
     if (result) break;
   }
-  parentPort.postMessage(result); // null = in diesem Bereich nichts gefunden
+  parentPort.postMessage(result); // Ergebnis ans Haupt-Programm schicken (null = nichts gefunden)
 }
 
 // ---------------------------------------------------------------------------
@@ -48,17 +55,20 @@ if (isMainThread) {
   const buckets = Array.from({ length: WORKERS }, () => []);
   letters.forEach((letter, i) => buckets[i % WORKERS].push(letter));
 
-  let finished = 0;
+  let finished = 0;    // wie viele Worker ohne Treffer fertig sind
   const workers = [];
 
+  // stoppt alle Worker (z.B. sobald einer das Passwort gefunden hat)
   function stopAll() {
     for (const w of workers) w.terminate();
   }
 
   for (const firstChars of buckets) {
+    // startet DIESE Datei nochmals als Worker und übergibt ihm seinen Buchstaben-Teil
     const worker = new Worker(__filename, { workerData: { firstChars } });
     workers.push(worker);
 
+    // wird aufgerufen, wenn der Worker sein Ergebnis zurückschickt
     worker.on("message", (result) => {
       if (result) {
         const seconds = (Date.now() - start) / 1000;
