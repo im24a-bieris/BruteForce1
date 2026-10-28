@@ -23,8 +23,8 @@ npm install
 | `vulnerable/server.js`      | Login-Server mit Klartext-Passwortvergleich (die Schwachstelle).  |
 | `secure/server.js`          | Abgesicherter Login-Server (Hashing, Lockout, Verzögerung).       |
 | `attack/2_1_bruteforce.js`  | Brute-Force: probiert Zeichenkombinationen durch.                 |
-| `attack/2_2_dictionary.js`  | Wörterbuch-Angriff: testet die Wörter aus `data/dictionary.txt`.  |
-| `attack/2_3_polyalphabet.js`| Poly-Alphabet-Brute-Force mit vollem Zeichensatz (a–z, A–Z, 0–9, Sonderzeichen). |
+| `attack/2_2_dictionary.js`  | Wörterbuch-Angriff (2.2): Wörter aus `data/dictionary.txt` + Varianten aus Opferdaten. |
+| `attack/2_2_polyalphabet.js`| Poly-Alphabet-Angriff (2.2): voller Zeichensatz (a–z, A–Z, 0–9, Sonderzeichen). |
 | `data/users.json`           | Zugangsdaten des verwundbaren Servers (`admin`/`monkey`, `test`/`a7`). |
 | `data/users.secure.json`    | Zugangsdaten des sicheren Servers (scrypt-Hash + Salt).           |
 | `data/dictionary.txt`       | Liste häufiger Passwörter.                                         |
@@ -45,9 +45,9 @@ Immer **aus dem Projekt-Stammverzeichnis** starten (der Wörterbuch-Angriff lies
 2. In einem zweiten Terminal einen Angriff starten:
 
    ```bash
-   npm run bruteforce    # Zeichen-für-Zeichen (nur a–z)
-   npm run dictionary    # Wörterbuch
-   npm run poly          # Poly-Alphabet: voller Zeichensatz, Ziel-Benutzer `test`
+   npm run bruteforce    # 2.1 Mono-Alphabet (nur a–z)
+   npm run dictionary    # 2.2 Wörterbuch + Opferdaten-Varianten
+   npm run poly          # 2.2 Poly-Alphabet: voller Zeichensatz, Ziel-Benutzer `test`
    ```
 
 ## Erwartetes Ergebnis
